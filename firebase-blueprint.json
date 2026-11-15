@@ -1,0 +1,429 @@
+{
+  "entities": {
+    "UserProfile": {
+      "title": "UserProfile",
+      "description": "Authenticated user account, marketplace role, tier, and credit balance.",
+      "type": "object",
+      "properties": {
+        "uid": {
+          "type": "string",
+          "pattern": "^[a-zA-Z0-9_\\-]+$",
+          "maxLength": 128,
+          "description": "Firebase Auth UID of the user."
+        },
+        "name": {
+          "type": "string",
+          "minLength": 2,
+          "maxLength": 80,
+          "description": "Display name of the creator."
+        },
+        "email": {
+          "type": "string",
+          "format": "email",
+          "maxLength": 160,
+          "description": "Verified Google email address."
+        },
+        "role": {
+          "type": "string",
+          "enum": ["Idea Giver", "Idea Taker", "Hybrid Creator"],
+          "description": "Primary marketplace participation role."
+        },
+        "bio": {
+          "type": "string",
+          "maxLength": 400,
+          "description": "Short creator bio."
+        },
+        "tier": {
+          "type": "string",
+          "enum": ["free", "pro"],
+          "description": "Active subscription tier."
+        },
+        "credits": {
+          "type": "number",
+          "description": "Available unlock and boost credit balance."
+        },
+        "savedIdeaIds": {
+          "type": "array",
+          "description": "Bounded list of saved idea IDs."
+        },
+        "unlockedIdeaIds": {
+          "type": "array",
+          "description": "Bounded list of unlocked premium idea IDs."
+        },
+        "upvotedIdeaIds": {
+          "type": "array",
+          "description": "Bounded list of upvoted idea IDs."
+        },
+        "joinedAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Server timestamp when user joined."
+        },
+        "updatedAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Server timestamp of last profile update."
+        }
+      },
+      "required": ["uid", "name", "email", "role", "bio", "tier", "credits", "savedIdeaIds", "unlockedIdeaIds", "upvotedIdeaIds", "joinedAt", "updatedAt"]
+    },
+    "IdeaBrief": {
+      "title": "IdeaBrief",
+      "description": "Marketplace startup, creator, or local business idea brief.",
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "pattern": "^[a-zA-Z0-9_\\-]+$",
+          "maxLength": 128,
+          "description": "Unique idea identifier."
+        },
+        "title": {
+          "type": "string",
+          "minLength": 6,
+          "maxLength": 140,
+          "description": "Catchy idea title."
+        },
+        "category": {
+          "type": "string",
+          "enum": [
+            "Creator Economy & Regional Content",
+            "Local & D2C Businesses",
+            "Student & EdTech Hacks",
+            "Local Services & Automation"
+          ],
+          "description": "Marketplace track."
+        },
+        "summary": {
+          "type": "string",
+          "minLength": 20,
+          "maxLength": 320,
+          "description": "Public 1-2 sentence marketplace summary."
+        },
+        "detailedDescription": {
+          "type": "string",
+          "minLength": 40,
+          "maxLength": 2500,
+          "description": "Full problem and workflow context."
+        },
+        "secretPitch": {
+          "type": "string",
+          "minLength": 25,
+          "maxLength": 2000,
+          "description": "Protected execution pitch and GTM wedge."
+        },
+        "executionRoadmap": {
+          "type": "array",
+          "description": "Step-by-step execution milestones."
+        },
+        "targetAudience": {
+          "type": "string",
+          "minLength": 4,
+          "maxLength": 160,
+          "description": "Target buyer segment."
+        },
+        "collaborationModel": {
+          "type": "string",
+          "enum": ["Equity Split", "Fixed Buyout", "Revenue Share", "Co-Founder Search"],
+          "description": "Preferred deal structure."
+        },
+        "askingTerms": {
+          "type": "string",
+          "minLength": 3,
+          "maxLength": 120,
+          "description": "Asking INR price or equity split."
+        },
+        "isPremium": {
+          "type": "boolean",
+          "description": "Whether execution blueprint is masked behind credits/Pro."
+        },
+        "unlockCredits": {
+          "type": "number",
+          "description": "Credits required to unlock when premium."
+        },
+        "authorId": {
+          "type": "string",
+          "pattern": "^[a-zA-Z0-9_\\-]+$",
+          "maxLength": 128,
+          "description": "Creator UID."
+        },
+        "authorName": {
+          "type": "string",
+          "minLength": 2,
+          "maxLength": 80,
+          "description": "Public author display name."
+        },
+        "authorRole": {
+          "type": "string",
+          "maxLength": 60,
+          "description": "Public author role label."
+        },
+        "authorHandle": {
+          "type": "string",
+          "maxLength": 60,
+          "description": "Public author handle."
+        },
+        "upvotes": {
+          "type": "number",
+          "description": "Community upvote count."
+        },
+        "tags": {
+          "type": "array",
+          "description": "Up to 10 topic tags."
+        },
+        "isFeatured": {
+          "type": "boolean",
+          "description": "Whether idea is boosted and pinned to top of feed."
+        },
+        "boostCredits": {
+          "type": "number",
+          "description": "Boost tier credits spent (10 or 15)."
+        },
+        "featuredAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "ISO timestamp when idea was boosted."
+        },
+        "isDeleted": {
+          "type": "boolean",
+          "description": "Soft-deletion flag for catalog entries moderated by admin."
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Server timestamp of creation."
+        },
+        "updatedAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Server timestamp of last modification."
+        }
+      },
+      "required": [
+        "id",
+        "title",
+        "category",
+        "summary",
+        "detailedDescription",
+        "secretPitch",
+        "executionRoadmap",
+        "targetAudience",
+        "collaborationModel",
+        "askingTerms",
+        "isPremium",
+        "unlockCredits",
+        "authorId",
+        "authorName",
+        "authorRole",
+        "authorHandle",
+        "upvotes",
+        "tags",
+        "isFeatured",
+        "createdAt",
+        "updatedAt"
+      ]
+    },
+    "CollaborationProposal": {
+      "title": "CollaborationProposal",
+      "description": "Collaboration pitch submitted by an Idea Taker on an idea brief.",
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "pattern": "^[a-zA-Z0-9_\\-]+$",
+          "maxLength": 128
+        },
+        "ideaId": {
+          "type": "string",
+          "pattern": "^[a-zA-Z0-9_\\-]+$",
+          "maxLength": 128
+        },
+        "ideaAuthorId": {
+          "type": "string",
+          "pattern": "^[a-zA-Z0-9_\\-]+$",
+          "maxLength": 128
+        },
+        "senderId": {
+          "type": "string",
+          "pattern": "^[a-zA-Z0-9_\\-]+$",
+          "maxLength": 128
+        },
+        "senderName": {
+          "type": "string",
+          "minLength": 2,
+          "maxLength": 80
+        },
+        "roleOffering": {
+          "type": "string",
+          "minLength": 3,
+          "maxLength": 100
+        },
+        "proposedTerms": {
+          "type": "string",
+          "minLength": 3,
+          "maxLength": 120
+        },
+        "message": {
+          "type": "string",
+          "minLength": 20,
+          "maxLength": 1200
+        },
+        "status": {
+          "type": "string",
+          "enum": ["Pending", "In Review", "Accepted"]
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "updatedAt": {
+          "type": "string",
+          "format": "date-time"
+        }
+      },
+      "required": [
+        "id",
+        "ideaId",
+        "ideaAuthorId",
+        "senderId",
+        "senderName",
+        "roleOffering",
+        "proposedTerms",
+        "message",
+        "status",
+        "createdAt",
+        "updatedAt"
+      ]
+    },
+    "CreditPurchaseRequest": {
+      "title": "CreditPurchaseRequest",
+      "description": "Manual FamPay/UPI UTR submission awaiting creator verification.",
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "pattern": "^[a-zA-Z0-9_\\-]+$",
+          "maxLength": 128
+        },
+        "userId": {
+          "type": "string",
+          "pattern": "^[a-zA-Z0-9_\\-]+$",
+          "maxLength": 128
+        },
+        "userName": {
+          "type": "string",
+          "minLength": 2,
+          "maxLength": 80
+        },
+        "userEmail": {
+          "type": "string",
+          "format": "email",
+          "maxLength": 160
+        },
+        "packId": {
+          "type": "string",
+          "enum": ["pack-50", "pack-100", "pack-500", "pro-tier-pass"]
+        },
+        "packType": {
+          "type": "string",
+          "enum": ["credits", "pro"]
+        },
+        "credits": {
+          "type": "number"
+        },
+        "amountInr": {
+          "type": "number"
+        },
+        "priceLabel": {
+          "type": "string",
+          "maxLength": 20
+        },
+        "utr": {
+          "type": "string",
+          "pattern": "^[0-9]{12}$",
+          "minLength": 12,
+          "maxLength": 12
+        },
+        "status": {
+          "type": "string",
+          "enum": ["Pending Verification", "Approved", "Rejected"]
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "updatedAt": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "reviewedAt": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "reviewedBy": {
+          "type": "string",
+          "maxLength": 128
+        }
+      },
+      "required": [
+        "id",
+        "userId",
+        "userName",
+        "userEmail",
+        "packId",
+        "packType",
+        "credits",
+        "amountInr",
+        "priceLabel",
+        "utr",
+        "status",
+        "createdAt",
+        "updatedAt"
+      ]
+    },
+    "AdminRecord": {
+      "title": "AdminRecord",
+      "description": "Trusted admin UID registry.",
+      "type": "object",
+      "properties": {
+        "uid": {
+          "type": "string",
+          "pattern": "^[a-zA-Z0-9_\\-]+$",
+          "maxLength": 128
+        },
+        "email": {
+          "type": "string",
+          "format": "email",
+          "maxLength": 160
+        },
+        "grantedAt": {
+          "type": "string",
+          "format": "date-time"
+        }
+      },
+      "required": ["uid", "email", "grantedAt"]
+    }
+  },
+  "firestore": {
+    "/users/{userId}": {
+      "schema": { "$ref": "#/entities/UserProfile" },
+      "description": "Private user account documents restricted to document owner or admin."
+    },
+    "/ideas/{ideaId}": {
+      "schema": { "$ref": "#/entities/IdeaBrief" },
+      "description": "Marketplace idea briefs readable publicly and writable by verified authors or admin."
+    },
+    "/proposals/{proposalId}": {
+      "schema": { "$ref": "#/entities/CollaborationProposal" },
+      "description": "Collaboration proposals attached to marketplace ideas."
+    },
+    "/paymentRequests/{requestId}": {
+      "schema": { "$ref": "#/entities/CreditPurchaseRequest" },
+      "description": "Manual UPI UTR verification requests restricted to submitting owner and admin."
+    },
+    "/admins/{userId}": {
+      "schema": { "$ref": "#/entities/AdminRecord" },
+      "description": "Trusted creator admin registry."
+    }
+  }
+}

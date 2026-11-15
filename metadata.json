@@ -1,0 +1,6 @@
+{
+  "name": "Idea Adda",
+  "description": "A two-sided creator marketplace connecting Idea Givers and Idea Takers, built by Viren Dev Labs.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
