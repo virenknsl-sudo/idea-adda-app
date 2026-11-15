@@ -8,6 +8,11 @@
 }
 
 @layer base {
+  html,
+  body {
+    color-scheme: dark;
+  }
+
   html {
     font-family: var(--font-sans);
     scroll-behavior: smooth;
