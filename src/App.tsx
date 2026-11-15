@@ -8,6 +8,7 @@ import { HeroSection } from './components/HeroSection';
 import { IdeaDetailModal } from './components/IdeaDetailModal';
 import { MarketplaceFeed } from './components/MarketplaceFeed';
 import { Navbar } from './components/Navbar';
+import { OfflineIndicator } from './components/OfflineIndicator';
 import { PlansAndCreditsView } from './components/PlansAndCreditsView';
 import { ProfileView } from './components/ProfileView';
 import { SubmitIdeaView } from './components/SubmitIdeaView';
@@ -811,6 +812,8 @@ export default function App() {
         onSubmitProposal={handleSubmitProposal}
         onBoostIdea={handleBoostIdea}
       />
+
+      <OfflineIndicator />
     </div>
   );
 }

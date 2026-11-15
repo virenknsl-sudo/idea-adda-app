@@ -1,0 +1,33 @@
+{
+  "id": "/",
+  "name": "Idea Adda — Viren Dev Labs",
+  "short_name": "Idea Adda",
+  "description": "A two-sided creator marketplace connecting Idea Givers and Idea Takers, built by Viren Dev Labs.",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "portrait-primary",
+  "theme_color": "#1D4ED8",
+  "background_color": "#090B10",
+  "categories": ["business", "productivity", "social"],
+  "icons": [
+    {
+      "src": "/pwa-192x192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/pwa-512x512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/pwa-maskable-512x512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ]
+}

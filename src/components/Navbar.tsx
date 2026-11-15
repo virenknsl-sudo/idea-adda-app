@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
 import { Menu, Moon, Sun, X } from 'lucide-react';
 import { AppView, SubscriptionTier, UserProfile } from '../types/marketplace';
+import { BrandLogo } from './BrandLogo';
+import { PWAInstallButton } from './PWAInstallButton';
 
 interface NavbarProps {
   activeView: AppView;
@@ -44,16 +46,16 @@ export const Navbar: React.FC<NavbarProps> = ({
   return (
     <header className="sticky top-0 z-40 border-b border-slate-200/90 dark:border-slate-800/90 bg-white/95 dark:bg-[#090B10]/95 backdrop-blur-sm">
       <div className="mx-auto flex max-w-6xl items-center justify-between gap-4 lg:gap-6 px-4 sm:px-6 h-16">
-        {/* Zone 1: Single text wordmark */}
+        {/* Zone 1: Brand icon + Idea Adda (Viren Dev Labs) wordmark */}
         <a
           href="#explore"
           onClick={(e) => {
             e.preventDefault();
             handleNav('explore');
           }}
-          className="font-display text-xl font-bold tracking-tight text-slate-900 dark:text-white whitespace-nowrap shrink-0 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-blue-600 rounded"
+          className="shrink-0 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-blue-600 rounded-lg"
         >
-          Idea Adda
+          <BrandLogo />
         </a>
 
         {/* Zone 2: Clean single-line text nav links */}
@@ -103,6 +105,8 @@ export const Navbar: React.FC<NavbarProps> = ({
             </span>
             <span>Creators Active Across India</span>
           </div>
+
+          <PWAInstallButton />
 
           <button
             type="button"

@@ -1,5 +1,6 @@
 import React from 'react';
 import { AppView } from '../types/marketplace';
+import { BrandLogo } from './BrandLogo';
 
 interface FooterProps {
   onNavigate: (view: AppView) => void;
@@ -11,10 +12,8 @@ export const Footer: React.FC<FooterProps> = ({ onNavigate }) => {
       <div className="mx-auto max-w-6xl px-4 sm:px-6 py-10">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-6">
           <div>
-            <p className="font-display text-lg font-bold tracking-tight text-slate-900 dark:text-white">
-              Idea Adda
-            </p>
-            <p className="mt-1 text-xs text-slate-500 dark:text-slate-400">
+            <BrandLogo compact showSubtext />
+            <p className="mt-2 text-xs text-slate-500 dark:text-slate-400">
               A Viren Dev Labs marketplace connecting Idea Givers and Idea Takers.
             </p>
           </div>
