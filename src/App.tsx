@@ -105,7 +105,7 @@ function formatActionError(err: unknown, fallback: string): string {
       const parsed = JSON.parse(err.message) as { error?: string };
       if (parsed?.error) {
         if (parsed.error.toLowerCase().includes('permission')) {
-          return 'Permission denied by database security rules. Ensure you are signed in with a verified Google account.';
+          return 'Permission denied by database security rules. Ensure you are signed in with your Google account and try again.';
         }
         return parsed.error;
       }

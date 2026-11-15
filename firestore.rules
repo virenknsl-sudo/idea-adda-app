@@ -35,9 +35,17 @@ service cloud.firestore {
 
     function isAdmin() {
       return isVerifiedUser() && (
-        exists(/databases/$(database)/documents/admins/$(request.auth.uid)) ||
-        request.auth.token.email == 'virenknsl@gmail.com'
+        ('email' in request.auth.token &&
+          request.auth.token.email is string &&
+          request.auth.token.email.lower() == 'virenknsl@gmail.com') ||
+        exists(/databases/$(database)/documents/admins/$(request.auth.uid))
       );
+    }
+
+    function matchesAuthEmail(email) {
+      return !('email' in request.auth.token) ||
+        !(request.auth.token.email is string) ||
+        email.lower() == request.auth.token.email.lower();
     }
 
     // --- Entity Validation Blueprints ---
@@ -181,11 +189,11 @@ service cloud.firestore {
     // --- User Profiles & Credit Wallets ---
     match /users/{userId} {
       allow get: if isValidId(userId) && (isOwner(userId) || isAdmin());
-      allow list: if isAdmin();
-      allow create: if isVerifiedUser() && isValidId(userId) && isOwner(userId) &&
+      allow list: if isSignedIn() && (resource.data.uid == request.auth.uid || isAdmin());
+      allow create: if isSignedIn() && isValidId(userId) && isOwner(userId) &&
         isValidUserProfile(incoming()) &&
         incoming().uid == request.auth.uid &&
-        incoming().email == request.auth.token.email &&
+        matchesAuthEmail(incoming().email) &&
         incoming().tier == 'free' &&
         incoming().credits == 5 &&
         incoming().savedIdeaIds.size() == 0 &&
@@ -194,7 +202,7 @@ service cloud.firestore {
         incoming().joinedAt == request.time &&
         incoming().updatedAt == request.time;
 
-      allow update: if isVerifiedUser() && isValidId(userId) &&
+      allow update: if isSignedIn() && isValidId(userId) &&
         isValidUserProfile(incoming()) &&
         incoming().uid == existing().uid &&
         incoming().email == existing().email &&
@@ -222,7 +230,7 @@ service cloud.firestore {
       allow get: if isValidId(ideaId);
       allow list: if true;
 
-      allow create: if isVerifiedUser() && isValidId(ideaId) &&
+      allow create: if isSignedIn() && isValidId(ideaId) &&
         isValidIdea(incoming()) &&
         incoming().id == ideaId &&
         incoming().createdAt == request.time &&
@@ -241,7 +249,7 @@ service cloud.firestore {
           )
         );
 
-      allow update: if isVerifiedUser() && isValidId(ideaId) &&
+      allow update: if isSignedIn() && isValidId(ideaId) &&
         isValidIdea(incoming()) &&
         incoming().id == existing().id &&
         incoming().authorId == existing().authorId &&
@@ -269,7 +277,7 @@ service cloud.firestore {
       allow get: if isValidId(proposalId);
       allow list: if true;
 
-      allow create: if isVerifiedUser() && isValidId(proposalId) &&
+      allow create: if isSignedIn() && isValidId(proposalId) &&
         isValidProposal(incoming()) &&
         incoming().id == proposalId &&
         incoming().senderId == request.auth.uid &&
@@ -277,7 +285,7 @@ service cloud.firestore {
         incoming().createdAt == request.time &&
         incoming().updatedAt == request.time;
 
-      allow update: if isVerifiedUser() && isValidId(proposalId) &&
+      allow update: if isSignedIn() && isValidId(proposalId) &&
         isValidProposal(incoming()) &&
         incoming().id == existing().id &&
         incoming().ideaId == existing().ideaId &&
@@ -297,18 +305,18 @@ service cloud.firestore {
     // --- FamPay / UPI UTR Payment Verification Queue ---
     match /paymentRequests/{requestId} {
       allow get: if isValidId(requestId) && isSignedIn() && (
-        isAdmin() || existing().userId == request.auth.uid
+        existing().userId == request.auth.uid || isAdmin()
       );
 
       allow list: if isSignedIn() && (
-        isAdmin() || resource.data.userId == request.auth.uid
+        resource.data.userId == request.auth.uid || isAdmin()
       );
 
-      allow create: if isVerifiedUser() && isValidId(requestId) &&
+      allow create: if isSignedIn() && isValidId(requestId) &&
         isValidPaymentRequest(incoming()) &&
         incoming().id == requestId &&
         incoming().userId == request.auth.uid &&
-        incoming().userEmail == request.auth.token.email &&
+        matchesAuthEmail(incoming().userEmail) &&
         incoming().status == 'Pending Verification' &&
         incoming().createdAt == request.time &&
         incoming().updatedAt == request.time &&

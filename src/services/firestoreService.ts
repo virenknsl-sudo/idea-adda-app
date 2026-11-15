@@ -171,78 +171,95 @@ function buildIdeaFirestorePayload(idea: IdeaItem, includeCreatedAt: boolean) {
   return payload;
 }
 
+const inFlightProfileEnsures = new Map<string, Promise<UserProfile>>();
+
 export async function ensureUserProfile(
   fbUser: FirebaseUser,
   preferredRole: UserProfile['role'] = 'Hybrid Creator'
 ): Promise<UserProfile> {
-  const uid = fbUser.uid;
-  const email = (fbUser.email ?? '').trim();
-  const userPath = `users/${uid}`;
-  const userRef = doc(db, 'users', uid);
-
-  let snap;
-  try {
-    snap = await getDoc(userRef);
-  } catch (err) {
-    handleFirestoreError(err, OperationType.GET, userPath);
+  const existingPromise = inFlightProfileEnsures.get(fbUser.uid);
+  if (existingPromise) {
+    return existingPromise;
   }
 
-  if (email.toLowerCase() === ADMIN_EMAIL && fbUser.emailVerified) {
-    const adminRef = doc(db, 'admins', uid);
+  const run = (async (): Promise<UserProfile> => {
+    const uid = fbUser.uid;
+    const rawEmail = (fbUser.email ?? fbUser.providerData?.[0]?.email ?? '').trim();
+    const email = rawEmail.length >= 5 ? rawEmail : `${uid}@users.ideaadda.local`;
+    const userPath = `users/${uid}`;
+    const userRef = doc(db, 'users', uid);
+
+    let snap;
     try {
-      const adminSnap = await getDoc(adminRef);
-      if (!adminSnap.exists()) {
-        await setDoc(adminRef, {
-          uid,
-          email,
-          grantedAt: serverTimestamp(),
-        });
-      }
-    } catch {
-      // Admin verified email rule still authorizes Viren cleanly
+      snap = await getDoc(userRef);
+    } catch (err) {
+      handleFirestoreError(err, OperationType.GET, userPath);
     }
-  }
 
-  if (snap.exists()) {
-    return mapUserDoc(uid, snap.data() as Record<string, unknown>, fbUser.emailVerified);
-  }
+    if (email.toLowerCase() === ADMIN_EMAIL && fbUser.emailVerified) {
+      const adminRef = doc(db, 'admins', uid);
+      try {
+        const adminSnap = await getDoc(adminRef);
+        if (!adminSnap.exists()) {
+          await setDoc(adminRef, {
+            uid,
+            email,
+            grantedAt: serverTimestamp(),
+          });
+        }
+      } catch {
+        // Admin verified email rule still authorizes Viren cleanly
+      }
+    }
 
-  const displayName = sanitizeDisplayName(fbUser.displayName, email);
-  const newProfileData = {
-    uid,
-    name: displayName,
-    email,
-    role: preferredRole,
-    bio: 'Building and exploring real-world Indian market ideas on Idea Adda.',
-    tier: SubscriptionTier.FREE,
-    credits: DEFAULT_STARTER_CREDITS,
-    savedIdeaIds: [] as string[],
-    unlockedIdeaIds: [] as string[],
-    upvotedIdeaIds: [] as string[],
-    joinedAt: serverTimestamp(),
-    updatedAt: serverTimestamp(),
-  };
+    if (snap.exists()) {
+      return mapUserDoc(uid, snap.data() as Record<string, unknown>, fbUser.emailVerified);
+    }
 
+    const displayName = sanitizeDisplayName(fbUser.displayName, email);
+    const newProfileData = {
+      uid,
+      name: displayName,
+      email,
+      role: preferredRole,
+      bio: 'Building and exploring real-world Indian market ideas on Idea Adda.',
+      tier: SubscriptionTier.FREE,
+      credits: DEFAULT_STARTER_CREDITS,
+      savedIdeaIds: [] as string[],
+      unlockedIdeaIds: [] as string[],
+      upvotedIdeaIds: [] as string[],
+      joinedAt: serverTimestamp(),
+      updatedAt: serverTimestamp(),
+    };
+
+    try {
+      await setDoc(userRef, newProfileData);
+    } catch (err) {
+      handleFirestoreError(err, OperationType.CREATE, userPath);
+    }
+
+    return {
+      id: uid,
+      name: displayName,
+      email,
+      emailVerified: fbUser.emailVerified,
+      role: preferredRole,
+      bio: newProfileData.bio,
+      tier: SubscriptionTier.FREE,
+      credits: DEFAULT_STARTER_CREDITS,
+      savedIdeaIds: [],
+      unlockedIdeaIds: [],
+      upvotedIdeaIds: [],
+      joinedAt: new Date().toISOString(),
+    };
+  })();
+
+  inFlightProfileEnsures.set(fbUser.uid, run);
   try {
-    await setDoc(userRef, newProfileData);
-  } catch (err) {
-    handleFirestoreError(err, OperationType.CREATE, userPath);
+    return await run;
+  } finally {
+    inFlightProfileEnsures.delete(fbUser.uid);
   }
-
-  return {
-    id: uid,
-    name: displayName,
-    email,
-    emailVerified: fbUser.emailVerified,
-    role: preferredRole,
-    bio: newProfileData.bio,
-    tier: SubscriptionTier.FREE,
-    credits: DEFAULT_STARTER_CREDITS,
-    savedIdeaIds: [],
-    unlockedIdeaIds: [],
-    upvotedIdeaIds: [],
-    joinedAt: new Date().toISOString(),
-  };
 }
 
 export function subscribeUserProfile(
