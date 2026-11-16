@@ -177,11 +177,14 @@ service cloud.firestore {
       allow get: if isValidId(userId) && (isOwner(userId) || isAdmin());
       allow list: if isAdmin();
       allow create: if isValidId(userId) && isVerifiedUser() && isOwner(userId) &&
-        request.auth.token.email == 'virenknsl@gmail.com' &&
+        'email' in request.auth.token &&
+        request.auth.token.email is string &&
+        request.auth.token.email.lower() == 'virenknsl@gmail.com' &&
         incoming().keys().hasAll(['uid', 'email', 'grantedAt']) &&
         incoming().keys().hasOnly(['uid', 'email', 'grantedAt']) &&
         incoming().uid == request.auth.uid &&
-        incoming().email == request.auth.token.email &&
+        incoming().email is string &&
+        incoming().email.lower() == request.auth.token.email.lower() &&
         incoming().grantedAt == request.time;
       allow update, delete: if false;
     }

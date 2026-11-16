@@ -91,6 +91,9 @@ export function canViewFullIdea(idea: IdeaItem, user: UserProfile | null): boole
   if (!user) {
     return false;
   }
+  if (isAdminUser(user)) {
+    return true;
+  }
   if (idea.authorId === user.id) {
     return true;
   }
@@ -154,6 +157,9 @@ export function validateBoostOnSubmit(
   if (!user) {
     return 'Sign in with Google to boost your idea using credits.';
   }
+  if (isAdminUser(user)) {
+    return null;
+  }
   if (user.credits < cost) {
     return `Need ${cost} credits to boost & feature this idea (you have ${user.credits} credits). Add credits on Plans & Credits or uncheck Boost to publish normally.`;
   }
@@ -180,13 +186,15 @@ export function boostIdeaWithCredits(params: {
   if (!target) {
     return { ok: false, error: 'Idea not found.' };
   }
-  if (target.authorId !== user.id) {
+
+  const adminBypass = isAdminUser(user);
+  if (target.authorId !== user.id && !adminBypass) {
     return { ok: false, error: 'You can only boost ideas you submitted.' };
   }
   if (target.isFeatured) {
     return { ok: false, error: 'This idea is already Featured / Sponsored at the top of the feed.' };
   }
-  if (user.credits < boostCredits) {
+  if (!adminBypass && user.credits < boostCredits) {
     return {
       ok: false,
       error: `Need ${boostCredits} credits to boost this idea (you currently have ${user.credits}). Add credits on Plans & Credits.`,
@@ -196,10 +204,12 @@ export function boostIdeaWithCredits(params: {
   const featuredAt = nowIso ?? new Date().toISOString();
   return {
     ok: true,
-    user: {
-      ...user,
-      credits: user.credits - boostCredits,
-    },
+    user: adminBypass
+      ? user
+      : {
+          ...user,
+          credits: user.credits - boostCredits,
+        },
     ideas: ideas.map((item) =>
       item.id === ideaId
         ? {
@@ -307,6 +317,10 @@ export function isAdminUser(user: UserProfile | null): boolean {
     user.email.trim().toLowerCase() === CREATOR_ADMIN_EMAIL &&
     user.emailVerified === true
   );
+}
+
+export function hasUnlimitedCredits(user: UserProfile | null): boolean {
+  return isAdminUser(user);
 }
 
 export function mergeCatalogIdeas(

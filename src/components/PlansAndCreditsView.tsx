@@ -128,14 +128,20 @@ export const PlansAndCreditsView: React.FC<PlansAndCreditsViewProps> = ({
         </div>
 
         {adminAuthorized && (
-          <button
-            type="button"
-            onClick={onOpenAdmin}
-            className="inline-flex h-10 items-center gap-2 rounded-lg border border-blue-600 dark:border-blue-500 bg-blue-50 dark:bg-blue-950/50 px-4 text-xs font-semibold text-blue-700 dark:text-blue-300 whitespace-nowrap shrink-0 hover:bg-blue-100 dark:hover:bg-blue-900/50 transition-colors cursor-pointer"
-          >
-            <ShieldCheck className="h-4 w-4" aria-hidden="true" />
-            <span>Open Creator Admin ({pendingAdminCount} Pending)</span>
-          </button>
+          <div className="flex flex-wrap items-center gap-2 shrink-0">
+            <span className="inline-flex h-10 items-center gap-1.5 rounded-lg border border-amber-400/70 dark:border-amber-500/60 bg-amber-50 dark:bg-amber-950/45 px-3 text-xs font-semibold text-amber-900 dark:text-amber-200">
+              <ShieldCheck className="h-4 w-4 text-amber-600 dark:text-amber-400" aria-hidden="true" />
+              <span>Owner / Admin · ∞ Unlimited</span>
+            </span>
+            <button
+              type="button"
+              onClick={onOpenAdmin}
+              className="inline-flex h-10 items-center gap-2 rounded-lg border border-blue-600 dark:border-blue-500 bg-blue-50 dark:bg-blue-950/50 px-4 text-xs font-semibold text-blue-700 dark:text-blue-300 whitespace-nowrap shrink-0 hover:bg-blue-100 dark:hover:bg-blue-900/50 transition-colors cursor-pointer"
+            >
+              <ShieldCheck className="h-4 w-4" aria-hidden="true" />
+              <span>Open Creator Admin ({pendingAdminCount} Pending)</span>
+            </button>
+          </div>
         )}
       </div>
 
@@ -295,7 +301,8 @@ export const PlansAndCreditsView: React.FC<PlansAndCreditsViewProps> = ({
           </div>
           {user && (
             <p className="font-mono text-sm font-semibold text-slate-900 dark:text-white tabular-nums">
-              Current Balance: {user.credits} Credits
+              Current Balance:{' '}
+              {adminAuthorized ? '∞ Unlimited (Owner / Admin)' : `${user.credits} Credits`}
             </p>
           )}
         </div>

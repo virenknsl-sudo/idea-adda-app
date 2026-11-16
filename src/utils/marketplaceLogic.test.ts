@@ -549,3 +549,58 @@ test('PRO_TIER_PASS creates Pro pack UTR purchase request and rejects oversized 
   assert.ok(oversizedErrors.unlockCredits);
 });
 
+test('verified Owner / Admin (virenknsl@gmail.com) gets unlimited credits and bypasses all credit checks and deductions', () => {
+  const ownerZeroCredits: UserProfile = {
+    ...sampleUserFree,
+    id: 'owner-viren',
+    email: 'VirenKnsl@gmail.com',
+    emailVerified: true,
+    tier: SubscriptionTier.FREE,
+    credits: 0,
+  };
+
+  assert.equal(isAdminUser(ownerZeroCredits), true);
+  assert.equal(canViewFullIdea(sampleIdeas[1], ownerZeroCredits), true);
+
+  const unlockResult = unlockIdeaWithCredits(sampleIdeas[1], ownerZeroCredits);
+  assert.equal(unlockResult.ok, true);
+  if (unlockResult.ok) {
+    assert.equal(unlockResult.user.credits, 0);
+  }
+
+  const boostSubmitErr = validateBoostOnSubmit(
+    {
+      title: 'Owner Priority Brief',
+      category: IdeaCategory.LOCAL_D2C,
+      summary: 'A clear summary that is over twenty characters.',
+      detailedDescription: 'A detailed description that comfortably exceeds forty characters.',
+      secretPitch: 'A concrete distribution pitch exceeding twenty-five chars.',
+      targetAudience: 'Local kirana stores',
+      collaborationModel: CollaborationModel.EQUITY_SPLIT,
+      askingTerms: '₹500',
+      isPremium: true,
+      unlockCredits: 5,
+      tagsText: 'upi',
+      boostIdea: true,
+      boostCredits: 15,
+    },
+    ownerZeroCredits
+  );
+  assert.equal(boostSubmitErr, null);
+
+  const ownerBoostResult = boostIdeaWithCredits({
+    ideas: sampleIdeas,
+    user: ownerZeroCredits,
+    ideaId: sampleIdeas[1].id,
+    boostCredits: 15,
+    nowIso: '2026-11-16T00:00:00Z',
+  });
+  assert.equal(ownerBoostResult.ok, true);
+  if (ownerBoostResult.ok) {
+    assert.equal(ownerBoostResult.user.credits, 0);
+    const pinned = ownerBoostResult.ideas.find((i) => i.id === sampleIdeas[1].id);
+    assert.equal(pinned?.isFeatured, true);
+    assert.equal(pinned?.boostCredits, 15);
+  }
+});
+

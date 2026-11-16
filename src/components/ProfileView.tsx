@@ -6,7 +6,7 @@ import {
   SubscriptionTier,
   UserProfile,
 } from '../types/marketplace';
-import { getUserStats } from '../utils/marketplaceLogic';
+import { getUserStats, isAdminUser } from '../utils/marketplaceLogic';
 
 interface ProfileViewProps {
   user: UserProfile | null;
@@ -72,6 +72,7 @@ export const ProfileView: React.FC<ProfileViewProps> = ({
     );
   }
 
+  const isOwnerAdmin = isAdminUser(user);
   const stats = getUserStats(user, ideas, proposals);
   const submittedIdeas = ideas.filter((i) => i.authorId === user.id);
   const unlockedIdeas = ideas.filter((i) => user.unlockedIdeaIds.includes(i.id));
@@ -91,7 +92,9 @@ export const ProfileView: React.FC<ProfileViewProps> = ({
       if (res.ok) {
         setBoostFeedback({
           type: 'success',
-          message: `"${idea.title}" boosted for ${credits} credits! It is now pinned at the top of the marketplace feed.`,
+          message: isOwnerAdmin
+            ? `"${idea.title}" boosted with Owner / Admin unlimited access! It is now pinned at the top of the marketplace feed.`
+            : `"${idea.title}" boosted for ${credits} credits! It is now pinned at the top of the marketplace feed.`,
         });
       } else {
         setBoostFeedback({
@@ -167,21 +170,29 @@ export const ProfileView: React.FC<ProfileViewProps> = ({
                     type="button"
                     disabled={boostingIdeaId === idea.id}
                     onClick={() => handleBoostClick(idea, 10)}
-                    aria-label={`Boost '${idea.title}' for 10 credits`}
+                    aria-label={
+                      isOwnerAdmin
+                        ? `Boost '${idea.title}' free as Owner / Admin`
+                        : `Boost '${idea.title}' for 10 credits`
+                    }
                     className="inline-flex h-9 items-center gap-1.5 rounded-lg border border-amber-400 dark:border-amber-500/70 bg-amber-50 dark:bg-amber-950/40 px-3 text-xs font-semibold text-amber-900 dark:text-amber-200 hover:bg-amber-100 dark:hover:bg-amber-900/50 disabled:opacity-60 transition-colors cursor-pointer"
                   >
                     <Sparkles className="h-3.5 w-3.5" aria-hidden="true" />
-                    <span>Boost (10 Cr)</span>
+                    <span>{isOwnerAdmin ? 'Boost (Owner Free)' : 'Boost (10 Cr)'}</span>
                   </button>
                   <button
                     type="button"
                     disabled={boostingIdeaId === idea.id}
                     onClick={() => handleBoostClick(idea, 15)}
-                    aria-label={`Priority boost '${idea.title}' for 15 credits`}
+                    aria-label={
+                      isOwnerAdmin
+                        ? `Priority boost '${idea.title}' free as Owner / Admin`
+                        : `Priority boost '${idea.title}' for 15 credits`
+                    }
                     className="inline-flex h-9 items-center gap-1.5 rounded-lg bg-amber-500 hover:bg-amber-600 disabled:opacity-60 px-3 text-xs font-semibold text-slate-950 transition-colors cursor-pointer"
                   >
                     <Sparkles className="h-3.5 w-3.5" aria-hidden="true" />
-                    <span>Top Pin (15 Cr)</span>
+                    <span>{isOwnerAdmin ? 'Top Pin (Owner Free)' : 'Top Pin (15 Cr)'}</span>
                   </button>
                 </>
               )}
@@ -206,6 +217,15 @@ export const ProfileView: React.FC<ProfileViewProps> = ({
         <div className="flex flex-col md:flex-row md:items-start justify-between gap-6">
           <div className="space-y-2 max-w-2xl">
             <div className="flex flex-wrap items-center gap-2.5 text-xs">
+              {isOwnerAdmin && (
+                <span
+                  data-testid="profile-owner-badge"
+                  className="inline-flex items-center gap-1.5 rounded-md border border-amber-400/80 dark:border-amber-500/70 bg-amber-50 dark:bg-amber-950/50 px-2.5 py-0.5 text-xs font-semibold text-amber-900 dark:text-amber-200"
+                >
+                  <ShieldCheck className="h-3.5 w-3.5 text-amber-600 dark:text-amber-400" aria-hidden="true" />
+                  <span>Owner / Admin</span>
+                </span>
+              )}
               <span className="font-semibold text-slate-600 dark:text-slate-300">
                 {user.role}
               </span>
@@ -218,13 +238,21 @@ export const ProfileView: React.FC<ProfileViewProps> = ({
               </span>
               <span
                 className={`inline-flex items-center gap-1 font-semibold ${
-                  user.tier === SubscriptionTier.PRO
-                    ? 'text-blue-700 dark:text-blue-400'
-                    : 'text-slate-700 dark:text-slate-300'
+                  isOwnerAdmin
+                    ? 'text-amber-700 dark:text-amber-400'
+                    : user.tier === SubscriptionTier.PRO
+                      ? 'text-blue-700 dark:text-blue-400'
+                      : 'text-slate-700 dark:text-slate-300'
                 }`}
               >
                 <ShieldCheck className="h-3.5 w-3.5" aria-hidden="true" />
-                <span>{user.tier === SubscriptionTier.PRO ? 'Pro Tier Member' : 'Free Tier'}</span>
+                <span>
+                  {isOwnerAdmin
+                    ? 'Unlimited Credits Access'
+                    : user.tier === SubscriptionTier.PRO
+                      ? 'Pro Tier Member'
+                      : 'Free Tier'}
+                </span>
               </span>
             </div>
 
@@ -324,9 +352,11 @@ export const ProfileView: React.FC<ProfileViewProps> = ({
         <div className="mt-8 pt-6 border-t border-slate-200 dark:border-slate-800 grid grid-cols-2 sm:grid-cols-5 gap-6">
           <div>
             <p className="font-mono text-2xl font-semibold text-slate-900 dark:text-white tabular-nums">
-              {user.credits}
+              {isOwnerAdmin ? '∞ Unlimited' : user.credits}
             </p>
-            <p className="mt-1 text-xs text-slate-500 dark:text-slate-400">Available Credits</p>
+            <p className="mt-1 text-xs text-slate-500 dark:text-slate-400">
+              {isOwnerAdmin ? 'Owner / Admin Credits' : 'Available Credits'}
+            </p>
           </div>
           <div>
             <p className="font-mono text-2xl font-semibold text-slate-900 dark:text-white tabular-nums">
@@ -432,9 +462,11 @@ export const ProfileView: React.FC<ProfileViewProps> = ({
         {activeTab === 'unlocked' &&
           renderIdeaList(
             unlockedIdeas,
-            user.tier === SubscriptionTier.PRO
-              ? 'As a Pro member, every premium blueprint in the marketplace is unlocked for you automatically.'
-              : 'No individual premium blueprints unlocked yet. Spend credits on any premium card to unlock.'
+            isOwnerAdmin
+              ? 'As Owner / Admin, every premium blueprint in the marketplace is unlocked for you with unlimited access.'
+              : user.tier === SubscriptionTier.PRO
+                ? 'As a Pro member, every premium blueprint in the marketplace is unlocked for you automatically.'
+                : 'No individual premium blueprints unlocked yet. Spend credits on any premium card to unlock.'
           )}
 
         {activeTab === 'saved' &&

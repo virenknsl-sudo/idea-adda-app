@@ -207,6 +207,10 @@ export const AdminDashboardView: React.FC<AdminDashboardViewProps> = ({
             featured startup briefs.
           </p>
         </div>
+        <span className="inline-flex h-9 items-center gap-1.5 rounded-lg border border-amber-400/70 dark:border-amber-500/60 bg-amber-50 dark:bg-amber-950/45 px-3 text-xs font-semibold text-amber-900 dark:text-amber-200 self-start sm:self-end whitespace-nowrap">
+          <ShieldCheck className="h-3.5 w-3.5 text-amber-600 dark:text-amber-400" aria-hidden="true" />
+          <span>Owner / Admin · ∞ Unlimited Credits</span>
+        </span>
       </div>
 
       {/* KPI Strip */}

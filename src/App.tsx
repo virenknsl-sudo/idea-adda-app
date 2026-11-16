@@ -419,7 +419,7 @@ export default function App() {
         boostCredits,
         featuredAt: target.featuredAt ?? new Date().toISOString(),
         isCloudDoc: cloudIdeaIds.has(ideaId),
-        adminBypass: false,
+        adminBypass: adminAuthorized,
       });
       setUser(res.user);
       return { ok: true };
@@ -482,16 +482,18 @@ export default function App() {
       featuredAt: shouldBoost ? nowIso : undefined,
     };
 
+    const chargeCredits = adminAuthorized ? 0 : boostCost;
+
     try {
       await publishIdeaToFirestore({
         idea: newIdea,
         user,
-        boostCost,
+        boostCost: chargeCredits,
       });
 
-      if (shouldBoost && boostCost > 0) {
+      if (shouldBoost && chargeCredits > 0) {
         setUser((prev) =>
-          prev ? { ...prev, credits: Math.max(0, prev.credits - boostCost) } : null
+          prev ? { ...prev, credits: Math.max(0, prev.credits - chargeCredits) } : null
         );
       }
 

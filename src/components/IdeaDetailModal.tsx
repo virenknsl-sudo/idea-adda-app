@@ -19,6 +19,7 @@ import {
 import {
   canViewFullIdea,
   formatCreditInrEstimate,
+  isAdminUser,
   validateProposal,
   ValidationErrors,
 } from '../utils/marketplaceLogic';
@@ -77,6 +78,7 @@ export const IdeaDetailModal: React.FC<IdeaDetailModalProps> = ({
 
   if (!idea) return null;
 
+  const isOwnerAdmin = isAdminUser(user);
   const isUnlocked = canViewFullIdea(idea, user);
   const isSaved = Boolean(user?.savedIdeaIds.includes(idea.id));
   const isUpvoted = Boolean(user?.upvotedIdeaIds.includes(idea.id));
@@ -295,7 +297,7 @@ export const IdeaDetailModal: React.FC<IdeaDetailModalProps> = ({
                       }}
                       className="inline-flex h-9 items-center gap-1 rounded-lg border border-amber-400 dark:border-amber-600 bg-white dark:bg-[#11151E] px-3 text-xs font-semibold text-amber-900 dark:text-amber-200 hover:bg-amber-100 dark:hover:bg-amber-900/40 cursor-pointer"
                     >
-                      <span>Boost (10 Cr)</span>
+                      <span>{isOwnerAdmin ? 'Boost (Owner Free)' : 'Boost (10 Cr)'}</span>
                     </button>
                     <button
                       type="button"
@@ -305,7 +307,7 @@ export const IdeaDetailModal: React.FC<IdeaDetailModalProps> = ({
                       }}
                       className="inline-flex h-9 items-center gap-1 rounded-lg bg-amber-500 hover:bg-amber-600 px-3 text-xs font-semibold text-slate-950 cursor-pointer"
                     >
-                      <span>Top Pin (15 Cr)</span>
+                      <span>{isOwnerAdmin ? 'Top Pin (Owner Free)' : 'Top Pin (15 Cr)'}</span>
                     </button>
                   </div>
                 </div>

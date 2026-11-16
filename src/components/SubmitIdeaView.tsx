@@ -8,6 +8,7 @@ import {
 } from '../types/marketplace';
 import {
   BOOST_OPTIONS,
+  isAdminUser,
   validateBoostOnSubmit,
   validateIdeaSubmission,
   ValidationErrors,
@@ -63,6 +64,7 @@ export const SubmitIdeaView: React.FC<SubmitIdeaViewProps> = ({
   const [errors, setErrors] = useState<ValidationErrors<IdeaSubmissionInput>>({});
   const [submittedNotice, setSubmittedNotice] = useState(false);
   const [submitting, setSubmitting] = useState(false);
+  const isOwnerAdmin = isAdminUser(user);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -454,7 +456,9 @@ export const SubmitIdeaView: React.FC<SubmitIdeaViewProps> = ({
             Featured ideas stay pinned at the top of the marketplace feed for maximum buyer visibility.{' '}
             {user && (
               <span className="font-mono font-semibold text-slate-800 dark:text-slate-200">
-                Available balance: {user.credits} Credits
+                {isOwnerAdmin
+                  ? 'Owner / Admin · ∞ Unlimited Credits (0 Cr deducted)'
+                  : `Available balance: ${user.credits} Credits`}
               </span>
             )}
           </p>
@@ -484,7 +488,7 @@ export const SubmitIdeaView: React.FC<SubmitIdeaViewProps> = ({
                           {option.label}
                         </span>
                         <span className="font-mono text-xs font-bold text-amber-700 dark:text-amber-400">
-                          {option.credits} Credits
+                          {isOwnerAdmin ? 'Owner Free' : `${option.credits} Credits`}
                         </span>
                       </div>
                       <p className="mt-1 text-xs text-slate-600 dark:text-slate-400">
@@ -495,7 +499,7 @@ export const SubmitIdeaView: React.FC<SubmitIdeaViewProps> = ({
                 })}
               </div>
 
-              {user && user.credits < boostCredits && (
+              {user && !isOwnerAdmin && user.credits < boostCredits && (
                 <div className="flex flex-wrap items-center justify-between gap-2 rounded-lg border border-amber-300 dark:border-amber-800 bg-white dark:bg-[#11151E] px-3.5 py-2.5 text-xs">
                   <span className="font-medium text-amber-900 dark:text-amber-200">
                     You have {user.credits} credits and need {boostCredits} credits for this boost.
@@ -529,8 +533,10 @@ export const SubmitIdeaView: React.FC<SubmitIdeaViewProps> = ({
               ? submitting
                 ? 'Publishing...'
                 : boostIdea
-                ? `Publish & Boost (${boostCredits} Cr)`
-                : 'Publish Idea Brief'
+                  ? isOwnerAdmin
+                    ? 'Publish & Boost (Owner Free)'
+                    : `Publish & Boost (${boostCredits} Cr)`
+                  : 'Publish Idea Brief'
               : 'Sign In to Publish'}
           </button>
         </div>
