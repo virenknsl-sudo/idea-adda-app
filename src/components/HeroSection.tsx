@@ -117,29 +117,37 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
             </div>
           </div>
 
-          {/* Right Column: Editorial Studio Photography */}
-          <div className="lg:col-span-5">
-            <div className="relative h-64 sm:h-80 lg:h-full w-full overflow-hidden rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-100 dark:bg-slate-900">
-              {!heroImgFailed ? (
-                <img
-                  src="/src/assets/images/hero_creator_atelier_1794712092897.jpg"
-                  alt="Idea Adda creator atelier with product sketches and venture blueprints"
-                  referrerPolicy="no-referrer"
-                  onError={() => setHeroImgFailed(true)}
-                  className="h-full w-full object-cover"
-                />
-              ) : (
-                <div className="flex h-full w-full flex-col justify-end bg-gradient-to-br from-slate-100 via-slate-200 to-blue-50 dark:from-slate-900 dark:via-slate-800 dark:to-blue-950 p-6">
-                  <p className="font-display text-lg font-semibold text-slate-900 dark:text-white">
-                    Idea Adda Studio
-                  </p>
-                  <p className="text-sm text-slate-600 dark:text-slate-300">
-                    Structured briefs, masked IP blueprints, and transparent creator terms.
-                  </p>
-                </div>
-              )}
-              <div className="pointer-events-none absolute inset-x-0 bottom-0 bg-gradient-to-t from-slate-950/80 via-slate-950/35 to-transparent p-5">
-                <p className="text-xs font-medium text-slate-200">
+          {/* Right Column: Editorial Studio Showcase */}
+          <div className="lg:col-span-5 flex">
+            <div className="flex w-full flex-col overflow-hidden rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-[#11151E]">
+              <div className="relative flex-1 min-h-56 sm:min-h-64 w-full overflow-hidden bg-slate-100 dark:bg-slate-900">
+                {!heroImgFailed ? (
+                  <img
+                    src="/images/hero-creator-atelier.jpg"
+                    alt="Idea Adda creator atelier with product sketches and venture blueprints"
+                    onError={() => setHeroImgFailed(true)}
+                    className="h-full w-full object-cover"
+                  />
+                ) : (
+                  <div className="flex h-full w-full flex-col justify-center gap-2 bg-gradient-to-br from-slate-100 via-slate-200 to-blue-50 dark:from-slate-900 dark:via-slate-800 dark:to-blue-950 p-6">
+                    <span className="text-xs font-mono uppercase tracking-wider text-blue-700 dark:text-blue-400">
+                      Viren Dev Labs · Studio
+                    </span>
+                    <p className="font-display text-lg font-semibold text-slate-900 dark:text-white">
+                      Curated Venture Blueprints
+                    </p>
+                  </div>
+                )}
+              </div>
+
+              <div className="flex flex-col gap-1.5 border-t border-slate-200 dark:border-slate-800 bg-white dark:bg-[#11151E] p-5">
+                <p className="font-display text-base font-bold text-slate-900 dark:text-white">
+                  Idea Adda Studio
+                </p>
+                <p className="text-xs sm:text-sm leading-relaxed text-slate-600 dark:text-slate-300">
+                  Structured briefs, masked IP blueprints, and transparent creator terms.
+                </p>
+                <p className="pt-1 text-xs font-medium text-blue-700 dark:text-blue-400">
                   Idea Givers publish briefs · Idea Takers unlock execution &amp; pitch terms
                 </p>
               </div>

@@ -45,19 +45,19 @@ const CURATED_SPOTLIGHTS: {
     category: IdeaCategory.CREATOR_REGIONAL,
     title: 'Creator Economy & Regional Content',
     subtitle: 'Hindi, Haryanvi & Punjabi AI script tools, city meme ad networks, and shaadi kits.',
-    image: '/src/assets/images/spotlight_content_studio_1794712093634.jpg',
+    image: '/images/spotlight-content-studio.jpg',
   },
   {
     category: IdeaCategory.LOCAL_D2C,
     title: 'Local & D2C Businesses',
     subtitle: 'WhatsApp kirana ordering, bridal & mehndi funnels, and mandi cloud kitchen supply.',
-    image: '/src/assets/images/spotlight_commerce_venture_1794712093705.jpg',
+    image: '/images/spotlight-commerce-venture.jpg',
   },
   {
     category: IdeaCategory.LOCAL_SERVICES,
     title: 'Local Services & Automation',
     subtitle: 'Chai tapri QR menus, WhatsApp GST billing plugins, and hyperlocal SMB ops.',
-    image: '/src/assets/images/spotlight_ai_automation_1794712092308.jpg',
+    image: '/images/spotlight-ai-automation.jpg',
   },
 ];
 
@@ -74,6 +74,7 @@ export const MarketplaceFeed: React.FC<MarketplaceFeedProps> = ({
   onToggleUpvote,
 }) => {
   const [visibleCount, setVisibleCount] = useState<number>(PAGE_SIZE);
+  const [failedTrackImages, setFailedTrackImages] = useState<Record<string, boolean>>({});
 
   useEffect(() => {
     setVisibleCount(PAGE_SIZE);
@@ -119,6 +120,7 @@ export const MarketplaceFeed: React.FC<MarketplaceFeedProps> = ({
           {CURATED_SPOTLIGHTS.map((spot) => {
             const count = ideas.filter((i) => i.category === spot.category).length;
             const isSelected = filters.category === spot.category;
+            const imgFailed = Boolean(failedTrackImages[spot.category]);
             return (
               <button
                 key={spot.category}
@@ -128,30 +130,40 @@ export const MarketplaceFeed: React.FC<MarketplaceFeedProps> = ({
                     category: isSelected ? IdeaCategory.ALL : spot.category,
                   })
                 }
-                className={`group text-left overflow-hidden rounded-xl border transition-colors duration-150 cursor-pointer focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600 ${
+                className={`group flex flex-col text-left overflow-hidden rounded-xl border transition-colors duration-150 cursor-pointer focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600 ${
                   isSelected
                     ? 'border-blue-600 dark:border-blue-500 bg-blue-50/40 dark:bg-blue-950/25'
                     : 'border-slate-200 dark:border-slate-800 bg-white dark:bg-[#11151E] hover:border-slate-300 dark:hover:border-slate-700'
                 }`}
               >
-                <div className="aspect-4/3 w-full overflow-hidden bg-slate-100 dark:bg-slate-900">
-                  <img
-                    src={spot.image}
-                    alt={`${spot.title} visual showcase`}
-                    referrerPolicy="no-referrer"
-                    className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-[1.02]"
-                  />
+                <div className="aspect-4/3 w-full overflow-hidden bg-slate-100 dark:bg-slate-900 shrink-0">
+                  {!imgFailed ? (
+                    <img
+                      src={spot.image}
+                      alt={`${spot.title} visual showcase`}
+                      onError={() =>
+                        setFailedTrackImages((prev) => ({ ...prev, [spot.category]: true }))
+                      }
+                      className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-[1.02]"
+                    />
+                  ) : (
+                    <div className="flex h-full w-full items-end bg-gradient-to-br from-slate-100 via-slate-200 to-blue-50 dark:from-slate-900 dark:via-slate-800 dark:to-blue-950 p-4">
+                      <span className="font-mono text-xs font-medium text-slate-600 dark:text-slate-300">
+                        {spot.title}
+                      </span>
+                    </div>
+                  )}
                 </div>
-                <div className="p-4">
-                  <div className="flex items-center justify-between gap-2 text-xs text-slate-500 dark:text-slate-400">
-                    <span className="font-semibold text-slate-900 dark:text-white text-sm">
+                <div className="flex flex-1 flex-col gap-2 p-4">
+                  <div className="flex items-start justify-between gap-3 text-xs text-slate-500 dark:text-slate-400">
+                    <span className="font-semibold text-slate-900 dark:text-white text-sm leading-snug">
                       {spot.title}
                     </span>
-                    <span className="font-mono tabular-nums whitespace-nowrap shrink-0">
+                    <span className="font-mono tabular-nums whitespace-nowrap shrink-0 pt-0.5">
                       {count} {count === 1 ? 'brief' : 'briefs'}
                     </span>
                   </div>
-                  <p className="mt-1 text-xs leading-relaxed text-slate-600 dark:text-slate-400">
+                  <p className="text-xs leading-relaxed text-slate-600 dark:text-slate-400">
                     {spot.subtitle}
                   </p>
                 </div>

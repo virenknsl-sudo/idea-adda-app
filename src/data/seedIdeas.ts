@@ -90,7 +90,7 @@ const RAW_SEED_IDEAS: SeedIdeaTuple[] = [
     createdAt: '2026-11-14T16:10:00Z',
     upvotes: 584,
     tags: ['shorts', 'youtube', 'hindi', 'upi'],
-    coverImage: '/src/assets/images/spotlight_content_studio_1794712093634.jpg',
+    coverImage: '/images/spotlight-content-studio.jpg',
     isFeatured: true,
     boostCredits: 10,
     featuredAt: '2026-11-14T16:10:00Z',
@@ -518,7 +518,7 @@ const RAW_SEED_IDEAS: SeedIdeaTuple[] = [
     createdAt: '2026-11-14T15:00:00Z',
     upvotes: 592,
     tags: ['kirana', 'whatsapp', 'upi', 'hyperlocal'],
-    coverImage: '/src/assets/images/spotlight_commerce_venture_1794712093705.jpg',
+    coverImage: '/images/spotlight-commerce-venture.jpg',
   },
   {
     id: 'idea-mehndi-bridal-lead-funnel',
@@ -1367,7 +1367,7 @@ const RAW_SEED_IDEAS: SeedIdeaTuple[] = [
     createdAt: '2026-11-14T14:40:00Z',
     upvotes: 576,
     tags: ['qr', 'upi', 'hyperlocal', 'whatsapp'],
-    coverImage: '/src/assets/images/spotlight_ai_automation_1794712092308.jpg',
+    coverImage: '/images/spotlight-ai-automation.jpg',
   },
   {
     id: 'idea-small-shop-gst-billing-plugin',
