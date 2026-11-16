@@ -11,6 +11,7 @@ import { Navbar } from './components/Navbar';
 import { OfflineIndicator } from './components/OfflineIndicator';
 import { PlansAndCreditsView } from './components/PlansAndCreditsView';
 import { ProfileView } from './components/ProfileView';
+import { SplashScreen } from './components/SplashScreen';
 import { SubmitIdeaView } from './components/SubmitIdeaView';
 import { SEED_IDEAS, SEED_PROPOSALS } from './data/seedIdeas';
 import { auth, googleProvider } from './firebase';
@@ -143,6 +144,9 @@ export default function App() {
   const [selectedIdeaId, setSelectedIdeaId] = useState<string | null>(null);
   const [detailInitialTab, setDetailInitialTab] = useState<'overview' | 'collaborate'>('overview');
   const [activeCreators, setActiveCreators] = useState<number>(ACTIVE_CREATORS_INITIAL);
+  const [authReady, setAuthReady] = useState(false);
+  const [minSplashDone, setMinSplashDone] = useState(false);
+  const [forceSplashDone, setForceSplashDone] = useState(false);
 
   const pendingRoleRef = useRef<UserProfile['role']>('Hybrid Creator');
 
@@ -163,6 +167,15 @@ export default function App() {
   }, [cloudProposals]);
 
   const adminAuthorized = useMemo(() => isAdminUser(user), [user]);
+
+  useEffect(() => {
+    const minTimer = window.setTimeout(() => setMinSplashDone(true), 1550);
+    const maxTimer = window.setTimeout(() => setForceSplashDone(true), 2050);
+    return () => {
+      window.clearTimeout(minTimer);
+      window.clearTimeout(maxTimer);
+    };
+  }, []);
 
   useEffect(() => {
     const timer = window.setInterval(() => {
@@ -224,6 +237,7 @@ export default function App() {
         if (active) {
           setUser(null);
           setPaymentRequests([]);
+          setAuthReady(true);
         }
         return;
       }
@@ -245,6 +259,8 @@ export default function App() {
         });
       } catch (err) {
         console.error('Auth profile sync warning:', err);
+      } finally {
+        if (active) setAuthReady(true);
       }
     });
 
@@ -254,6 +270,8 @@ export default function App() {
       unsubAuth();
     };
   }, []);
+
+  const showSplash = !forceSplashDone && (!minSplashDone || !authReady);
 
   const filteredIdeas = useMemo(() => filterAndSortIdeas(ideas, filters), [ideas, filters]);
 
@@ -814,6 +832,7 @@ export default function App() {
       />
 
       <OfflineIndicator />
+      <SplashScreen visible={showSplash} />
     </div>
   );
 }
